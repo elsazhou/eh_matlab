@@ -1,0 +1,67 @@
+%p2_1 initialization t
+%Q2 is changing
+%only energy cooperation
+clear all
+clc
+a=2; %path loss exponent
+Q_all=1*10^(-1).*[1 0.25;1 0.5;1 0.75;1 1;1 1.5;1 2;1 2.5;1 3;1 3.5;1 4];%x2is changing
+%Q_all=1*10^(-1).*[0.25 1;0.5 1;0.75 1;1 1;1.5 1;2 1;2.5 1;3 1;3.5 1;4 1];%x1 is changing
+eta=0.8;
+m=size(Q_all,1);
+d=[1;2;1];
+sigma=[10^(-4);10^(-4)];
+epsi=0.0001;
+%record optimal
+maxthrpt5=zeros(m,1);
+maxthrpt6=zeros(m,1);
+opt5_t0=zeros(3,m);
+opt5_time1=zeros(m,1);
+opt5_time2=zeros(m,1);
+opt5_time3=zeros(m,1);
+opt6_t0=zeros(3,m);
+opt6_time1=zeros(m,1);
+opt6_time2=zeros(m,1);
+opt6_time3=zeros(m,1);
+%ini t
+tot_iter=0;
+for ic=1:m
+    Q=Q_all(ic,:)';
+    for t01=0.1:0.1:0.8
+        for t02=0.1:0.1:0.9-t01
+            t03=1-t01-t02;
+            t0=[t01;t02;t03];
+            [Pka1,tka1,throuput1]=ehp2_ec_ca(a,t0,Q,d,sigma,epsi,eta);
+            sumthrp1=sum(throuput1);
+            if(maxthrpt5(ic)<sumthrp1)
+                maxthrpt5(ic)=sumthrp1;
+                opt5_t0(:,ic)=t0;
+                opt5_time1(ic)=tka1(1);
+                opt5_time2(ic)=tka1(2);
+                opt5_time3(ic)=tka1(3);
+                save e_maxthrpt_q2c_ca.mat ic Q_all opt5_time1 opt5_time2 opt5_time3 opt5_t0 maxthrpt5
+            end
+            [Pkb1,tkb1,throuput2]=ehp2_ec_cb(a,t0,Q,d,sigma,epsi,eta);
+            sumthrp2=sum(throuput2);
+            if(maxthrpt6(ic)<sumthrp2)
+                maxthrpt6(ic)=sumthrp2;
+                opt6_t0(:,ic)=t0;
+                opt6_time1(ic)=tkb1(1);
+                opt6_time2(ic)=tkb1(2);
+                opt6_time3(ic)=tkb1(3);
+                save e_maxthrpt_q2c_cb.mat ic Q_all opt6_time1 opt6_time2 opt6_time3 opt6_t0 maxthrpt6
+            end
+            tot_iter=tot_iter+1;
+        end
+    end
+end
+
+pli=1000*Q_all(:,2);
+figure;
+plot(pli,maxthrpt5,'ro-');
+hold on
+plot(pli,maxthrpt6,'md-');
+hold on
+xlabel('Energy arrival rates of node 2(mW)')
+ylabel('Troughput(bps/Hz)')
+title('Comparison of Sum-Throughput (X1=100mW)')
+legend('only energy cooperation (CA)','only energy cooperation (CB)')
