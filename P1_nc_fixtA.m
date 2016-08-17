@@ -1,0 +1,14 @@
+function [thr1,Pk1]=P1_nc_fixtA(t,r,Q)
+t1=t(1);
+t2=t(2);
+t3=t(3);
+r1=r(1);
+r2=r(2);
+Q1=Q(1);
+Q2=Q(2);
+thr1=zeros(2,1);
+Pk1=zeros(2,1);
+Pk1(1)=Q1*t3/t1;
+Pk1(2)=Q2*(t1+t3)/t2;
+thr1(1)=t1*log(1+Pk1(1)*r1);
+thr1(2)=t2*log(1+Pk1(2)*r2);
